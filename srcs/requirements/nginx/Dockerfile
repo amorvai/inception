@@ -1,18 +1,32 @@
-# Layer 1
-FROM alpine:3.21.3
+### Layer 1 : Base image ######################################
 
-# Layer 2 (cached, rarely changes)
-# # Install NGINX and OpenSSL
+FROM alpine:3.21.3
+# Use a minimal Alpine image for a smaller footprint
+
+
+### Layer 2 : System tools & packages #########################
+# (rarely changes, therefore mostly already cached)
+
 RUN apk update && apk add --no-cache \
                                         nginx \
                                         openssl
+# # Install NGINX and OpenSSL
 
-# Layer 3
-# # Copy our NGINX configuration file  # (This is the file I am gonna edit a lot!)
+
+### Layer 3 : Configuration and application files #############
+# (changes more often)
+
 COPY ./conf/nginx.conf /etc/nginx/
+# # Copy our NGINX configuration file
+
+# not needed for alpine:
+        # RUN mkdir -p /usr/local/bin 
+        # RUN mkdir -p /run/nginx
+
+COPY ./tools/entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
 
 
 # Layer 4
-# # sets global configuration directives
-CMD ["nginx", "-g", "daemon off;"]
-
+ENTRYPOINT [ "sh", "/usr/local/bin/entrypoint.sh" ]
+# CMD ["nginx", "-g", "daemon off;"] # old way, but ENTRYPOINT is better for custom scripts
