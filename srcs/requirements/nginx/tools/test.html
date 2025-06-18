@@ -1,0 +1,51 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+        <meta charset="UTF-8">
+        <title>Test Page</title>
+        <!-- <link rel="stylesheet" href="/css/style.css"> -->
+</head>
+
+<body>
+        <h1>Test Page</h1>
+        <p>This is a test page to verify that Nginx is serving static files correctly.</p>
+        <p>Current time: <span id="time"></span></p>
+        <script>
+                // Function to update the time every second
+                function updateTime() {
+                        const now = new Date();
+                        const timeString = now.toLocaleTimeString();
+                        document.getElementById('time').textContent = timeString;
+                }
+                // Update the time immediately and then every second
+                updateTime();
+                setInterval(updateTime, 1000);
+        </script>
+</body>
+
+</html>
+
+<style>
+        body {
+                font-family: Arial, sans-serif;
+                background-color: #f4f4f4;
+                color: #333;
+                margin: 0;
+                padding: 20px;
+        }
+
+        h1 {
+                color: #4CAF50;
+        }
+
+        p {
+                font-size: 18px;
+        }
+
+        #time {
+                font-weight: bold;
+                color: #FF5722;
+        }
+</style>
