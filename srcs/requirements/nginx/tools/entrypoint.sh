@@ -8,7 +8,7 @@ sh /usr/local/bin/generate_ssl.sh
 
 if [ "$1" = 'sh' ]; then
   exec "$1"
-  # Run an interactive shell if 'sh' is the first argument,
+  # Run the interactive shell if 'sh' is the first argument,
   #  keeping the container in the foreground.
 #   exec "$@"
 else
