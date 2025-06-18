@@ -8,26 +8,30 @@ services:
 
   nginx:
 
-    build:
-      context:                  ./requirements/nginx
     container_name:             ${NGINX_CONTAINER_NAME}
     image:                      ${NGINX_IMAGE_NAME}
+    build:
+      context:                  ./requirements/nginx
+
+    restart:                    on-failure
+
     env_file:
       - .env
+
+    # volumes:
+    #   # In case of our poject we dont need a separate nginx volume
+    #   #   - ${NGINX_VOLUME}:/var/www/html
+    #   - ${WP_VOLUME}:/var/www/html
+
+    ports:
+      - "${NGINX_PORT}:443"
+
     # depends_on:
       # - wordpress
       # - db
 
-    ports:
-      - "${NGINX_PORT}:443"
     networks:
       - ${NETWORK_NAME}
-    volumes:
-      # In case of our poject we dont need a separate nginx volume
-      #   - ${NGINX_VOLUME}:/var/www/html
-      - ${WP_VOLUME}:/var/www/html
-    
-    restart:                    on-failure
 
 
 #   wordpress:
@@ -53,6 +57,6 @@ services:
 #   ${WP_VOLUME}:
 
 networks:
-  ${NETWORK_NAME}:
+  inception_net:
     name: ${NETWORK_NAME}
     driver: bridge
