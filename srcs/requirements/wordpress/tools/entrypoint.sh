@@ -10,7 +10,7 @@ if [ ! -d /var/www/html ]; then
 fi
 
 # move to the WordPress Working directory
-cd /var/www/html
+# cd /var/www/html                              #WORKING_DIRECTORY set in Dockerfile
 
 # Check if group 'www-data' exists, if not create it
 if ! getent group www-data > /dev/null 2>&1; then
@@ -72,7 +72,6 @@ if [ ! -f wp-config.php ]; then
             --user_pass="$WP_GUEST_PASS" \
             --allow-root \
         #     --path=/var/www/html              # not needed, we moved into /var/www/html (working directory)
-
     fi
 
     # Set proper permissions on wp-content

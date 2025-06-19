@@ -5,17 +5,13 @@ version: '3.8'
 
 services:
 
-
   nginx:
-
     container_name:             nginx
     # image:
     build:
       context:                  ./requirements/nginx
       dockerfile:               Dockerfile
-
     restart:                    on-failure
-
     env_file:
       - .env
 
@@ -24,41 +20,35 @@ services:
               # In case of our poject we dont need a separate nginx volume
               # Were using the wordpress volume directly.
       - wp-volume:/var/www/html
+      # !!! important difference:
       # wp-database:/var/lib/mysql    = named volume      → auto-created by Docker.
       # ./wp-database:/var/lib/mysql  = host directory    → created if missing, can override container data.
-
     ports:
       - "443:443"
-
-    # depends_on:
-      # - wordpress
-      # - mariadb
-
+    depends_on:
+      - wordpress
     networks:
       - ${NETWORK_NAME}
 
 
-  # wordpress:
+  wordpress:
+    container_name:             wordpress
+    # image:                      
+    build:
+      context:                  ./requirements/wordpress
+      dockerfile:               Dockerfile
+    restart:                    on-failure
+    env_file:
+      - .env
 
-  #   container_name:             wordpress
-  #   # image:                      
-  #   build:
-  #     context:                  ./requirements/wordpress
-  #     dockerfile:               Dockerfile
+    volumes:
+      - wp-volume:/var/www/html
+    depends_on:
+      mariadb:
+        condition: service_healthy
+    networks:
+      - ${NETWORK_NAME}
 
-  #   restart:                    on-failure
-
-  #   env_file:
-  #     - .env
-
-  #   # volumes:
-  #   #   - wp-volume:/var/www/html
-
-  #   # depends_on:
-  #   #   - mariadb
-
-  #   networks:
-  #     - ${NETWORK_NAME}
 
   mariadb:
 
@@ -67,12 +57,9 @@ services:
     build:
       context:                  ./requirements/mariadb
       dockerfile:               Dockerfile
-
     restart:                    on-failure
-
     env_file:
       - .env
-
     # environment:                                    # possible -bly 
     #   DB_ROOT:                  
     #   MYSQL_DATABASE:           ${MYSQL_DATABASE}
@@ -81,14 +68,24 @@ services:
 
     volumes:
       - db-volume:/var/lib/mysql
-
     networks:
       - ${NETWORK_NAME}
-
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      # start_period: 5s
 
 volumes:
   wp-volume:
+    driver_opts:
+      o: bind
+      type: none
   db-volume:
+    driver_opts:
+      o: bind
+      type: none
 
 networks:
   inception: # should be ${NETWORK_NAME} but we use a fixed name because I have no script to replace environment variables in this file

@@ -10,18 +10,18 @@ set -eu
 
 # Check for required environment variables
 : "${MYSQL_ROOT_PASSWORD:?Missing required MYSQL_ROOT_PASSWORD}"
-: "${MYSQL_DATABASE:?Missing required MYSQL_DATABASE}"
+: "${MYSQL_DB_NAME:?Missing required MYSQL_DB_NAME}"
 : "${MYSQL_USER:?Missing required MYSQL_USER}"
-: "${MYSQL_PASSWORD:?Missing required MYSQL_PASSWORD}"
+: "${MYSQL_USER_PASSWORD:?Missing required MYSQL_USER_PASSWORD}"
 
 
 # Ensure 'mysql' group exists
-if ! getent group mysql > /dev/null; then
+if ! getent group mysql > /dev/null 2>&1; then
     echo "Creating mysql group..."
     addgroup -S mysql
 fi
 # Ensure 'mysql' user exists
-if ! getent passwd mysql > /dev/null; then
+if ! getent passwd mysql > /dev/null 2>&1; then
     echo "Creating mysql user..."
     adduser -S -G mysql -h /var/lib/mysql mysql
 fi
@@ -67,11 +67,11 @@ DELETE FROM mysql.db WHERE Db='test';
 
 DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1');
 
-# ALTER USER 'root'@'localhost' IDENTIFIED BY '${MYSQL_ROOT_PASSWORD}';
+ALTER USER 'root'@'localhost' IDENTIFIED BY '${MYSQL_ROOT_PASSWORD}';
 
-CREATE DATABASE IF NOT EXISTS \`${MYSQL_DATABASE}\`;
-CREATE USER IF NOT EXISTS '${MYSQL_USER}'@'%' IDENTIFIED BY '${MYSQL_PASSWORD}';
-GRANT ALL PRIVILEGES ON \`${MYSQL_DATABASE}\`.* TO '${MYSQL_USER}'@'%';
+CREATE DATABASE IF NOT EXISTS \`${MYSQL_DB_NAME}\`;
+CREATE USER IF NOT EXISTS '${MYSQL_USER}'@'%' IDENTIFIED BY '${MYSQL_USER_PASSWORD}';
+GRANT ALL PRIVILEGES ON \`${MYSQL_DB_NAME}\`.* TO '${MYSQL_USER}'@'%';
 
 FLUSH PRIVILEGES;
 EOF

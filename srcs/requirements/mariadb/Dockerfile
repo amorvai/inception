@@ -3,7 +3,7 @@
 
 FROM alpine:3.21.3
 
-
+###############################################################################################
 ### Layer 2 : System tools & packages #########################################################
 # (rarely changes, therefore mostly already cached)
 
@@ -12,13 +12,9 @@ RUN apk update && apk add --no-cache \
                                         mariadb-client
 # Install MariaDB and its client
 
-
-# ### Layer 3 : Configuration and application files #############################################
+###############################################################################################
+# ### Layer 3 : Configuration and application files ###########################################
 # # (changes more often)
-
-
-# COPY ./conf/mariadb.conf /etc/my.cnf
-# RUN chmod 644 /etc/my.cnf                     # revise with /etc/my.cnf.d/mariadb-server.cnf
 
 COPY ./conf/mariadb.conf /etc/my.cnf.d/mariadb-server.cnf
 # This file gets loaded automatically as part of the !includedir /etc/my.cnf.d directive, which is usually present in /etc/my.cnf
@@ -36,7 +32,7 @@ RUN chmod +x /usr/local/bin/mariadb-entrypoint.sh
 
 EXPOSE 3306
 
-
+###############################################################################################
 ### Layer 4 : Startup [script] ################################################################
 
 ENTRYPOINT [ "sh", "./usr/local/bin/mariadb-entrypoint.sh" ]
