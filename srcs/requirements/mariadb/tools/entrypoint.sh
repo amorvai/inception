@@ -2,7 +2,8 @@
 
 # entrypoint.sh for MariaDB container
 
-
+# set -x
+# -x : Print commands and their arguments as they are executed.
 set -eu
 # -e : Exit immediately if a command exits with a non-zero status.
 # -u : Treat unset variables as an error when substituting.
