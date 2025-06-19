@@ -8,55 +8,89 @@ services:
 
   nginx:
 
-    container_name:             ${NGINX_CONTAINER_NAME}
-    image:                      ${NGINX_IMAGE_NAME}
+    container_name:             nginx
+    # image:
     build:
       context:                  ./requirements/nginx
+      dockerfile:               Dockerfile
 
     restart:                    on-failure
 
     env_file:
       - .env
 
-    # volumes:
-    #   # In case of our poject we dont need a separate nginx volume
-    #   #   - ${NGINX_VOLUME}:/var/www/html
-    #   - ${WP_VOLUME}:/var/www/html
+    volumes:
+              #   - nginx-volume:/var/www/html
+              # In case of our poject we dont need a separate nginx volume
+              # Were using the wordpress volume directly.
+      - wp-volume:/var/www/html
+      # wp-database:/var/lib/mysql    = named volume      → auto-created by Docker.
+      # ./wp-database:/var/lib/mysql  = host directory    → created if missing, can override container data.
 
     ports:
-      - "${NGINX_PORT}:443"
+      - "443:443"
 
     # depends_on:
       # - wordpress
-      # - db
+      # - mariadb
 
     networks:
       - ${NETWORK_NAME}
 
 
-#   wordpress:
-  
-#     build:
-#       context:                  ./requirements/wordpress
-#     container_name:             ${WP_CONTAINER_NAME}
-#     image:                      ${WP_IMAGE_NAME}
-#     env_file:
-#       - .env
-#     # depends_on:
-#     #   - db
+  # wordpress:
 
-#     networks:
-#       - ${NETWORK_NAME}
-#     volumes:
-#       - ${WP_VOLUME}:/var/www/html
+  #   container_name:             wordpress
+  #   # image:                      
+  #   build:
+  #     context:                  ./requirements/wordpress
+  #     dockerfile:               Dockerfile
 
-#     restart:                    on-failure
+  #   restart:                    on-failure
 
-# volumes:
-#   # ${NGINX_VOLUME}:
-#   ${WP_VOLUME}:
+  #   env_file:
+  #     - .env
+
+  #   # volumes:
+  #   #   - wp-volume:/var/www/html
+
+  #   # depends_on:
+  #   #   - mariadb
+
+  #   networks:
+  #     - ${NETWORK_NAME}
+
+  mariadb:
+
+    container_name:             mariadb
+    # image:                      
+    build:
+      context:                  ./requirements/mariadb
+      dockerfile:               Dockerfile
+
+    restart:                    on-failure
+
+    env_file:
+      - .env
+
+    # environment:                                    # possible -bly 
+    #   DB_ROOT:                  
+    #   MYSQL_DATABASE:           ${MYSQL_DATABASE}
+    #   MYSQL_USER:               ${MYSQL_USER}
+    #   MYSQL_PASSWORD:           ${MYSQL_PASSWORD}
+
+    volumes:
+      - db-volume:/var/lib/mysql
+
+    networks:
+      - ${NETWORK_NAME}
+
+
+volumes:
+  wp-volume:
+  db-volume:
 
 networks:
-  inception_net:
+  inception: # should be ${NETWORK_NAME} but we use a fixed name because I have no script to replace environment variables in this file
     name: ${NETWORK_NAME}
     driver: bridge
