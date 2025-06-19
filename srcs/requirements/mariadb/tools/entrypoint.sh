@@ -42,6 +42,7 @@ chmod 755 -R /run/mysqld /var/lib/mysql /var/log/mysql
 if [ ! -d /var/lib/mysql/mysql ]; then
     echo "Initialize MariaDB data directory..."
     mariadb-install-db --user=mysql --datadir=/var/lib/mysql > /dev/null # --basedir=/usr --datadir=/var/lib/mysql --user=mysql --rpm
+    echo "MariaDB data directory initialized."
 fi
 
 # Initialize the wordpress database if it does not exist
@@ -65,6 +66,7 @@ DELETE FROM mysql.db WHERE Db='test';
 
 DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1');
 
+# ALTER USER 'root'@'localhost' IDENTIFIED BY '${MYSQL_ROOT_PASSWORD}';
 
 CREATE DATABASE IF NOT EXISTS \`${MYSQL_DATABASE}\`;
 CREATE USER IF NOT EXISTS '${MYSQL_USER}'@'%' IDENTIFIED BY '${MYSQL_PASSWORD}';
@@ -73,8 +75,9 @@ GRANT ALL PRIVILEGES ON \`${MYSQL_DATABASE}\`.* TO '${MYSQL_USER}'@'%';
 FLUSH PRIVILEGES;
 EOF
 
-
-# ALTER USER 'root'@'localhost' IDENTIFIED BY '${MYSQL_ROOT_PASSWORD}';
+############################ !!! NEEDS FIXING !!! ##################################            no more fix, works in code above, just had to use -p for password
+# ALTER USER 'root'@'localhost' IDENTIFIED BY '${MYSQL_ROOT_PASSWORD}';                     BUT 
+############################ !!! NEEDS FIXING !!! ##################################  (bc of volume?) it doesnt even rebuild properly when i move it outside the statement
 
     # Bootstrap the database with the user/database setup
     # --bootstrap runs the server in a special mode to execute SQL commands from stdin
@@ -82,6 +85,7 @@ EOF
     /usr/bin/mariadbd --bootstrap --user=mysql < "$TEMP_SQL_FILE"
     rm -f "$TEMP_SQL_FILE"
 
+    echo "WordPress database initialized."
 fi
 
 
