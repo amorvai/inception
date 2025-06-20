@@ -30,8 +30,6 @@ fi
 # -h : Specify the home directory for the user (in this case, '/var/lib/mysql').
 
 # Ensure the runtime directories exist and are owned by MySQL
-# if [ ! -d "/run/mysqld" || ]; then
-# fi                                                             # idee
 mkdir -p /run/mysqld /var/lib/mysql /var/log/mysql
 chown -R mysql:mysql /run/mysqld /var/lib/mysql /var/log/mysql
 chmod 755 -R /run/mysqld /var/lib/mysql /var/log/mysql
@@ -65,20 +63,14 @@ DELETE FROM mysql.user WHERE user='';
 DROP DATABASE IF EXISTS test;
 DELETE FROM mysql.db WHERE Db='test';
 
-DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1');
-
-ALTER USER 'root'@'localhost' IDENTIFIED BY '${MYSQL_ROOT_PASSWORD}';
-
 CREATE DATABASE IF NOT EXISTS \`${MYSQL_DB_NAME}\`;
 CREATE USER IF NOT EXISTS '${MYSQL_USER}'@'%' IDENTIFIED BY '${MYSQL_USER_PASSWORD}';
 GRANT ALL PRIVILEGES ON \`${MYSQL_DB_NAME}\`.* TO '${MYSQL_USER}'@'%';
 
+ALTER USER 'root'@'localhost' IDENTIFIED BY '${MYSQL_ROOT_PASSWORD}';
+
 FLUSH PRIVILEGES;
 EOF
-
-############################ !!! NEEDS FIXING !!! ##################################            no more fix, works in code above, just had to use -p for password
-# ALTER USER 'root'@'localhost' IDENTIFIED BY '${MYSQL_ROOT_PASSWORD}';                     BUT 
-############################ !!! NEEDS FIXING !!! ##################################  (bc of volume?) it doesnt even rebuild properly when i move it outside the statement
 
     # Bootstrap the database with the user/database setup
     # --bootstrap runs the server in a special mode to execute SQL commands from stdin
@@ -88,16 +80,6 @@ EOF
 
     echo "WordPress database initialized."
 fi
-
-
-
-# # Ensure system user 'mariadb' exists (optional, for host-level file permissions)
-# if ! id -u mariadb >/dev/null 2>&1; then
-#     adduser -D mariadb
-
-# fi
-# chown -R mariadb:mariadb /var/lib/mysql
-# chmod 755 -R /var/lib/mysql                                           
 
 
 # Start MariaDB server as the 'mysql' user
@@ -111,9 +93,7 @@ exec /usr/bin/mariadbd --user=mysql
 
 
 
-
-
-#############################################  Uebersichtlich klein -- DASSELBE NICHT WEG BITTE
+#############################################  Uebersichtlich ohne commentary -- DASSELBE NICHT WEG BITTE
 
 # set -eu
 # # Check for required environment variables

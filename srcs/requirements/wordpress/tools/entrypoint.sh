@@ -53,6 +53,8 @@ if [ ! -f wp-config.php ]; then
         --dbpass="$MYSQL_USER_PASSWORD" \
         --dbhost="$MYSQL_HOST" \
         --allow-root \
+        --force \
+        --config-file=/var/www/html/wp-config.php 
         # --path=/var/www/html                  # not needed, we moved into /var/www/html (working directory)
 
     # Install WordPress
@@ -62,7 +64,7 @@ if [ ! -f wp-config.php ]; then
         --admin_user="$WP_ADMIN_USER" \
         --admin_password="$WP_ADMIN_PASS" \
         --admin_email="$WP_ADMIN_EMAIL" \
-        --allow-root \
+        --allow-root
         # --path=/var/www/html                  # not needed, we moved into /var/www/html (working directory)
 
     # Optionally add extra user
@@ -70,7 +72,7 @@ if [ ! -f wp-config.php ]; then
         wp user create "$WP_GUEST_USER" "$WP_GUEST_EMAIL" \
             --role="${WP_GUEST_ROLE:-editor}" \
             --user_pass="$WP_GUEST_PASS" \
-            --allow-root \
+            --allow-root
         #     --path=/var/www/html              # not needed, we moved into /var/www/html (working directory)
     fi
 

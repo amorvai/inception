@@ -43,12 +43,9 @@ RUN curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli
 COPY ./conf/www.conf /etc/php83/php-fpm.d/www.conf
 # Copy our WordPress configuration file
 
-RUN sed -i '/^memory_limit\s*=/c\memory_limit = 512M' /etc/php83/php.ini \
-|| echo "memory_limit = 512M" >> /etc/php83/php.ini
-# RUN sed -i 's/^memory_limit = .*/memory_limit = 512M/' /etc/php83/php.ini \
-# || echo "memory_limit = 512M" >> /etc/php83/php.ini
-#                                                       # two ways: change (c\), replace (s///).
-#                                                       # first is more tolerant towards whitespace in this case.
+grep -q '^\s*memory_limit' /etc/php83/php.ini \
+&& sed -i 's|^\s*memory_limit\s*=.*|memory_limit = 512M|' /etc/php83/php.ini \
+|| echo 'memory_limit = 512M' >> /etc/php83/php.ini
 
 COPY ./tools/entrypoint.sh /usr/local/bin/wordpress-entrypoint.sh
 RUN chmod +x /usr/local/bin/wordpress-entrypoint.sh
