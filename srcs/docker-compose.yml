@@ -13,7 +13,7 @@ services:
     volumes:
               #   - nginx-volume:/var/www/html
               # In case of our poject we dont need a separate nginx volume
-              # Were using the wordpress volume directly.
+              # we're using the wordpress volume directly for nginx as well.
       - wp-volume:/var/www/html
       # !!! important difference:
       # wp-database:/var/lib/mysql    = named volume      → auto-created by Docker.
@@ -28,7 +28,7 @@ services:
 
   wordpress:
     container_name:             wordpress
-    # image:                      
+    # image:
     build:
       context:                  ./requirements/wordpress
       dockerfile:               Dockerfile
@@ -39,8 +39,9 @@ services:
     volumes:
       - wp-volume:/var/www/html
     depends_on:
-      mariadb:
-        condition: service_healthy
+      - mariadb
+      # mariadb:
+      #   - healthcheck
     networks:
       - ${NETWORK_NAME}
 
@@ -54,37 +55,34 @@ services:
     restart:                    on-failure
     env_file:
       - .env
-    # environment:                                    # possible -bly 
-    #   DB_ROOT:                  
-    #   MYSQL_DATABASE:           ${MYSQL_DATABASE}
-    #   MYSQL_USER:               ${MYSQL_USER}
-    #   MYSQL_PASSWORD:           ${MYSQL_PASSWORD}
 
     volumes:
       - db-volume:/var/lib/mysql
     networks:
       - ${NETWORK_NAME}
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      # start_period: 5s
+    # healthcheck:
+    #   test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+    #   interval: 10s
+    #   timeout: 5s
+    #   retries: 5
+    #   start_period: 5s
 
 
 volumes:
   wp-volume:
+    driver: local
     driver_opts:
       o: bind
       type: none
       device: /home/amorvai/data
   db-volume:
+    driver: local
     driver_opts:
       o: bind
       type: none
       device: /home/amorvai/data
 
 networks:
-  inception: # should be ${NETWORK_NAME} but we use a fixed name because I have no script to replace environment variables in this file
+  inception: # in a perfect world this could be ${NETWORK_NAME} as well, no?
     name: ${NETWORK_NAME}
     driver: bridge
