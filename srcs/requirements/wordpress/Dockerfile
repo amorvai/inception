@@ -43,7 +43,7 @@ RUN curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli
 COPY ./conf/www.conf /etc/php83/php-fpm.d/www.conf
 # Copy our WordPress configuration file
 
-grep -q '^\s*memory_limit' /etc/php83/php.ini \
+RUN grep -q '^\s*memory_limit' /etc/php83/php.ini \
 && sed -i 's|^\s*memory_limit\s*=.*|memory_limit = 512M|' /etc/php83/php.ini \
 || echo 'memory_limit = 512M' >> /etc/php83/php.ini
 
