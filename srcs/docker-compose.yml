@@ -74,13 +74,13 @@ volumes:
     driver_opts:
       o: bind
       type: none
-      device: /home/amorvai/data
+      device: /home/amorvai/data/wp
   db-volume:
     driver: local
     driver_opts:
       o: bind
       type: none
-      device: /home/amorvai/data
+      device: /home/amorvai/data/db
 
 networks:
   inception: # in a perfect world this could be ${NETWORK_NAME} as well, no?
