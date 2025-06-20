@@ -1,4 +1,4 @@
-DOCKER_COMPOSE = docker compose
+DOCKER_COMPOSE = docker compose -f ./srcs/docker-compose.yml
 
 build:
 	$(DOCKER_COMPOSE) build
